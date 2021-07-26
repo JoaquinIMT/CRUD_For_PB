@@ -83,6 +83,10 @@ function ContactList() {
   const handleUpdate = (user:ContactInfo) => {
     updateUser(user)
     handleClose()
+    setContactInfo([
+      ...contactInfo.filter((info)=> info.id!==user.id),
+      user
+    ])
   }
 
   const handleEdit = (contact: ContactInfo) => {
@@ -99,6 +103,12 @@ function ContactList() {
 
   const handleCloseCreate = () => {
     setOpenCreate(false)
+  }
+
+  const handleCreate = (contact: ContactInfo) => {
+    setContactInfo([
+      ...contactInfo,
+      contact])
   }
   
 
@@ -123,7 +133,7 @@ function ContactList() {
      onClose={handleCloseCreate}
      aria-labelledby="modal-create"
     >
-      <ModalCreate handleClose={handleCloseCreate}/>
+      <ModalCreate handleClose={handleCloseCreate} handleCreate={handleCreate}/>
     </Modal>
   </Grid>;
 }

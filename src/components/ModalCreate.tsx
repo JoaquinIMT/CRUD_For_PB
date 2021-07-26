@@ -18,7 +18,7 @@ const useStyles = makeStyles({
 })
 
 
-function ModalCreate(props: {handleClose: Function}){
+function ModalCreate(props: {handleClose: Function, handleCreate:Function}){
     const classes = useStyles()
     const [contact, setContact] = useState<ContactInfo>({} as ContactInfo)
     const [loading, setLoading] = useState(false)
@@ -44,6 +44,7 @@ function ModalCreate(props: {handleClose: Function}){
         .then( (data)=>{
           console.log("Done")
           setLoading(false)
+          props.handleCreate(contact)
         }).catch(e=>{
             console.log("Error en post")
             setLoading(false)
