@@ -27,7 +27,7 @@ function ConctactDetail() {
   return <Grid container justifyContent="center">
     <Header/>
     <Grid container justifyContent="center">
-       { loading? <Loading/> : <ContactDetail contact={contactInfo} edit={false} /> } 
+       { loading? <Loading/> : <ContactDetail contact={contactInfo} edit={false} handleChange={()=>{}} /> } 
     </Grid>
   </Grid>;
 }

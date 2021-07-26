@@ -11,11 +11,12 @@ const useStyles = makeStyles({
     },
 })
 
-function ContactDetail(props: {contact: ContactInfo, edit: boolean }){
+const  ContactDetail: React.FunctionComponent< {contact: ContactInfo, edit: boolean, handleChange: Function }> = props => {
     const classes = useStyles()
 
     const disable = !props.edit
     let contact = props.contact
+    const handleChange = (e:{}) => props.handleChange(e)
 
     return <Card className={classes.root}>
             <CardMedia
@@ -26,30 +27,37 @@ function ContactDetail(props: {contact: ContactInfo, edit: boolean }){
                 <Grid container spacing={2} justifyContent="center">
                     <Grid item>
                         <TextField
+                            name="first_name"
                             disabled={disable}
                             label="First Name"
                             defaultValue={contact.first_name}
                             variant="outlined"
+                            onChange={handleChange}
                         />
                     </Grid>
                     <Grid item>
                         <TextField
+                            name="last_name"
                             disabled={disable}
                             label="Last Name"
                             defaultValue={contact.last_name}
                             variant="outlined"
+                            onChange={handleChange}
                         />
                     </Grid>
                     <Grid item>
                         <TextField
+                            name="email"
                             disabled={disable}
                             label="E-mail"
                             defaultValue={contact.email}
                             variant="outlined"
+                            onChange={handleChange}
                         />
                     </Grid>
                 </Grid>
             </CardContent>
+            {props.children}
         </Card>
 }
 

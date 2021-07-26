@@ -2,11 +2,11 @@ import React, {useEffect, useState} from 'react';
 import CardsContainer from '../components/CardsContainer';
 import ContactInfo from '../utils/ContactInterface';
 import { API } from '../utils/Constants';
-import { Button, createStyles, Fab, Grid, makeStyles, Modal, Theme, Tooltip } from '@material-ui/core';
+import { createStyles, Fab, Grid, makeStyles, Modal, Theme, Tooltip } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 import Loading from '../components/Loading';
 import Header from '../components/Header';
-import ContactDetail from '../components/ContactDetails';
+import ModalEdit from '../components/ModalEdit';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -15,12 +15,16 @@ const useStyles = makeStyles((theme: Theme) =>
       bottom: theme.spacing(0),
       right: theme.spacing(3),
     },
+    tooltip: {
+      marginBottom:'1%'
+    }
   }),
 );
 
 
 function ContactList() {
   const [loading, setLoading] = useState(true)
+  const [buttonLoading, setButtonLoading] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
   const [contact, setContact] = useState<ContactInfo>({} as ContactInfo)
   const [contactInfo, setContactInfo] = useState< ContactInfo[] >([])
@@ -37,7 +41,29 @@ function ContactList() {
       })
   },[] )
 
-  const handleClose = () => setOpenEdit(false)
+  const updateUser = (user: ContactInfo) => {
+    setButtonLoading(true)
+    fetch(`${API}/user/${user.id}`,{
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(user)
+    }).then( ()=>{
+      console.log("Done")
+      setButtonLoading(false)
+    }).catch(e=>console.log("Error en put"))
+  }
+
+  const handleClose = () => {
+    setOpenEdit(false)
+  }
+
+  const handleUpdate = (user:ContactInfo) => {
+    updateUser(user)
+    handleClose()
+  }
+
   const handleEdit = (contact: ContactInfo) => {
     setContact(contact)
     setOpenEdit(true)
@@ -51,7 +77,7 @@ function ContactList() {
     <Header />
     { loading ? <Loading/> : <CardsContainer list={contactInfo} handleEdit={handleEdit} handleEliminate={handleEliminate} /> }
     
-    <Tooltip title="Add" aria-label="add">
+    <Tooltip className={classes.tooltip} title="Add" aria-label="add">
         <Fab color="primary" className={classes.absolute} onClick={()=>{}}>
           <AddIcon />
         </Fab>
@@ -59,16 +85,10 @@ function ContactList() {
     <Modal
      open={openEdit}
      onClose={handleClose}
+     aria-labelledby="simple-modal-title"
+     aria-describedby="simple-modal-description"
     >
-      <Grid container spacing={3} justifyContent="center">
-        <Grid container justifyContent="center">
-          <ContactDetail contact={contact} edit={true} />
-        </Grid>
-        <br/>
-        <Grid item>
-          <Button variant="contained" color="primary" onClick={handleClose}>Save</Button>
-        </Grid>
-      </Grid>
+      <ModalEdit loading={buttonLoading} contact={contact} handleUpdate={handleUpdate} />
     </Modal>
   </Grid>;
 }
