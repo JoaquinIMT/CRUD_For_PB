@@ -7,6 +7,7 @@ import AddIcon from '@material-ui/icons/Add';
 import Loading from '../components/Loading';
 import Header from '../components/Header';
 import ModalEdit from '../components/ModalEdit';
+import ModalCreate from '../components/ModalCreate';
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -26,6 +27,7 @@ function ContactList() {
   const [loading, setLoading] = useState(true)
   const [buttonLoading, setButtonLoading] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
+  const [openCreate, setOpenCreate] = useState(false)
   const [contact, setContact] = useState<ContactInfo>({} as ContactInfo)
   const [contactInfo, setContactInfo] = useState< ContactInfo[] >([])
   
@@ -43,7 +45,7 @@ function ContactList() {
 
   const updateUser = (user: ContactInfo) => {
     setButtonLoading(true)
-    fetch(`${API}/user/${user.id}`,{
+    fetch(`${API}/users/${user.id}`,{
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json'
@@ -52,7 +54,26 @@ function ContactList() {
     }).then( ()=>{
       console.log("Done")
       setButtonLoading(false)
-    }).catch(e=>console.log("Error en put"))
+    }).catch(e=>{
+      console.log("Error en put")
+      setLoading(false)
+  })
+  }
+
+  const eliminateUser = () => {
+    fetch(`${API}/users/${contact.id}`,{
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then( (response)=>{
+      console.log("Done")
+      setButtonLoading(false)
+      console.log(response)
+    }).catch(e=>{
+      console.log("Error en delete")
+      setLoading(false)
+  })
   }
 
   const handleClose = () => {
@@ -70,6 +91,14 @@ function ContactList() {
   }
   const handleEliminate = (contact: ContactInfo) => {
     setContact(contact)
+    eliminateUser()
+    setContactInfo(
+      contactInfo.filter((info)=> info.id!==contact.id )
+    )
+  }
+
+  const handleCloseCreate = () => {
+    setOpenCreate(false)
   }
   
 
@@ -78,17 +107,23 @@ function ContactList() {
     { loading ? <Loading/> : <CardsContainer list={contactInfo} handleEdit={handleEdit} handleEliminate={handleEliminate} /> }
     
     <Tooltip className={classes.tooltip} title="Add" aria-label="add">
-        <Fab color="primary" className={classes.absolute} onClick={()=>{}}>
+        <Fab color="primary" className={classes.absolute} onClick={()=>{setOpenCreate(true)}}>
           <AddIcon />
         </Fab>
     </Tooltip>
     <Modal
      open={openEdit}
      onClose={handleClose}
-     aria-labelledby="simple-modal-title"
-     aria-describedby="simple-modal-description"
+     aria-labelledby="modal-edit"
     >
       <ModalEdit loading={buttonLoading} contact={contact} handleUpdate={handleUpdate} />
+    </Modal>
+    <Modal
+     open={openCreate}
+     onClose={handleCloseCreate}
+     aria-labelledby="modal-create"
+    >
+      <ModalCreate handleClose={handleCloseCreate}/>
     </Modal>
   </Grid>;
 }
